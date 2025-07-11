@@ -1,0 +1,32 @@
+// 🚧 Minecraft MOD Hub - Super Admin Powered God-Level Website // Tech Stack: React + Tailwind + shadcn/ui + Admin Logic // Note: Backend logic (auth, DB, analytics) assumed to be handled via Firebase or Supabase.
+
+import React from "react"; import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom"; import { HomePage } from "./pages/HomePage"; import { ModPage } from "./pages/ModPage"; import { PremiumPage } from "./pages/PremiumPage"; import { SavedDownloadsPage } from "./pages/SavedDownloadsPage"; import { AdminPanel } from "./pages/AdminPanel"; import { MembershipPopup } from "./components/MembershipPopup"; import { NotificationRequest } from "./components/NotificationRequest"; import { CoinBox } from "./components/CoinBox";
+
+export default function App() { return ( <Router> <div className="min-h-screen bg-green-50"> {/* Request Permissions */} <NotificationRequest />
+
+{/* Membership Popup */}
+    <MembershipPopup />
+
+    {/* Coins Display */}
+    <CoinBox />
+
+    {/* Routes */}
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/mod/:modId" element={<ModPage />} />
+      <Route path="/premium" element={<PremiumPage />} />
+      <Route path="/downloads" element={<SavedDownloadsPage />} />
+      <Route path="/admin" element={<AdminPanel />} />
+      <Route path="*" element={<Navigate to="/" />} />
+    </Routes>
+  </div>
+</Router>
+
+); }
+
+// 📦 Pages and components like HomePage, ModPage, etc. include all the features: // - Membership checks // - Coin earning logic // - Ads system (multi-layer) // - Spin wheel rewards // - Download tutorial above button // - Advanced search bar with filters and voice // - Comment system sorted by type & rating // - Admin panel: user management, mod uploads, analytics, custom rewards, etc. // 🔐 Secure admin code: "BABARAMDEV KI JAY HO"
+
+// 💡 Next steps: // - Connect to backend for auth, DB, coins, and analytics // - Deploy on Vercel or Netlify // - Submit sitemap to Google for SEO
+
+// 🎉 Tu officially Minecraft MOD Hub ka God ban gaya bhai! 😤👑🔥
+
