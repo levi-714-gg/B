@@ -1,0 +1,40 @@
+Absolutely! Here’s a simple example: a chatbot app code using *JavaScript* that can run in a basic web app (you can later connect it to AI APIs like OpenAI’s GPT for smarter replies).
+
+This chatbot will respond to user messages with simple comforting replies to help alone people feel heard.
+
+```javascript
+// Simple chatbot logic
+const responses = [
+  "I'm here for you. Tell me more.",
+  "That sounds tough, but you're not alone.",
+  "I'm listening. What's on your mind?",
+  "It's okay to feel that way.",
+  "You're doing great. Keep going!"
+];
+
+function getResponse() {
+  // Return a random comforting message
+  const index = Math.floor(Math.random() * responses.length);
+  return responses[index];
+}
+
+function sendMessage() {
+  const userInput = document.getElementById("userInput").value;
+  if (userInput.trim() === "") return;
+
+  // Display user's message
+  const chatBox = document.getElementById("chatBox");
+  chatBox.innerHTML += `<div class="user-msg">You: userInput</div>`;
+
+  // Get bot response
+  const botReply = getResponse();
+  chatBox.innerHTML += `<div class="bot-msg">Bot:{botReply}</div>`;
+
+  document.getElementById("userInput").value = "";
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+```
+
+And the simple HTML to run it:
+
+```html
