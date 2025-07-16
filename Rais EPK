@@ -1,0 +1,67 @@
+const express = require('express');
+const multer  = require('multer');
+const path = require('path');
+const fs = require('fs');
+const app = express();
+const port = process.env.PORT || 3000;
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, 'uploads/'),
+  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname),
+});
+const upload = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    cb(ext === '.apk' ? null : new Error('Only .apk files allowed'), ext === '.apk');
+  }
+});
+
+app.use(express.static('public'));
+
+// رفع الملفات
+app.post('/upload', upload.single('apkfile'), (req, res) => {
+  res.send(`APK uploaded! <a href="/uploads/${req.file.filename}">Download it here</a>`);
+});
+
+// صفحة تعرض كل الملفات
+app.get('/files', (req, res) => {
+  fs.readdir('uploads/', (err, files) => {
+    if (err) return res.status(500).send('Error reading files');
+    let list = files.map(f => `<li><a href="/uploads/${f}">${f}</a></li>`).join('');
+    res.send(`<h1>📦 Uploaded APK Files</h1><ul>${list}</ul>`);
+  });
+});
+
+// تمكين التحميل
+app.use('/uploads', express.static('uploads'));
+
+app.listen(port, () => console.log(`Server running on port ${port}`));
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quick APK Uploader</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    input[type=file] { margin: 20px; }
+    button { padding: 10px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h1>🚀 Quick APK Uploader</h1>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="apkfile" accept=".apk" required><br>
+    <button type="submit">Upload APK</button>
+  </form>
+  <p id="response"></p>
+  <a href="/files">View uploaded APK files</a>
+  <script>
+    document.getElementById('uploadForm').onsubmit = async e => {
+      e.preventDefault();
+      const res = await fetch('/upload', { method: 'POST', body: new FormData(e.target) });
+      document.getElementById('response').innerHTML = await res.text();
+    };
+  </script>
+</body>
+</html>
