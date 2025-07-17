@@ -1,0 +1,98 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>💘 Just One Question 💘</title>
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Quicksand', sans-serif;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      text-align: center;
+      overflow: hidden;
+    }
+    h1 {
+      color: #fff;
+      font-family: 'Pacifico', cursive;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+    }
+    .button-container {
+      display: flex;
+      gap: 20px;
+    }
+    button {
+      padding: 12px 24px;
+      font-size: 1em;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-family: 'Quicksand', sans-serif;
+    }
+    #yesBtn {
+      background-color: #fff;
+      color: #e91e63;
+    }
+    #noBtn {
+      background-color: #e91e63;
+      color: #fff;
+      position: relative;
+    }
+    .message-box {
+      margin-top: 30px;
+      font-size: 1.3em;
+      color: #fff;
+      max-width: 80%;
+      font-family: 'Quicksand', sans-serif;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1 id="question">Do you love Jay?</h1>
+  <div class="button-container" id="buttonContainer">
+    <button id="yesBtn">Yes ❤️</button>
+    <button id="noBtn">No 💔</button>
+  </div>
+  <div class="message-box" id="messageBox"></div>  <script>
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const messageBox = document.getElementById("messageBox");
+    const question = document.getElementById("question");
+    const buttonContainer = document.getElementById("buttonContainer");
+
+    let noClickCount = 0;
+
+    yesBtn.addEventListener("click", () => {
+      messageBox.innerHTML =
+        "<p>Hearing you say yes feels like the most beautiful moment I’ve ever known. I promise to cherish you and every moment we share from here on. I can’t wait to begin this journey together. 💖</p>";
+      question.classList.add("hidden");
+      buttonContainer.classList.add("hidden");
+    });
+
+    noBtn.addEventListener("click", (e) => {
+      noClickCount++;
+      if (noClickCount === 1) {
+        alert("WRONG ANSWER, TRY AGAIN 💢");
+      } else {
+        const btnWidth = noBtn.offsetWidth;
+        const btnHeight = noBtn.offsetHeight;
+        const x = Math.floor(Math.random() * (window.innerWidth - btnWidth));
+        const y = Math.floor(Math.random() * (window.innerHeight - btnHeight));
+        noBtn.style.position = "absolute";
+        noBtn.style.left = x + "px";
+        noBtn.style.top = y + "px";
+      }
+    });
+  </script></body>
+</html>
