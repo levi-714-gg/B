@@ -1,56 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-  <!-- 
-      This is an HTML comment
-      You can write text in a comment and the content won't be visible in the page
-    -->
-
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="https://glitch.com/favicon.ico" />
-
-  <!--
-      This is the page head - it contains info the browser uses
-      Like the title, which appears on the browser tab but not inside the page
-      Further down you'll see the content that displays in the page
-    -->
-  <title>Hello World!</title>
-
-  <!-- The website stylesheet -->
-  <link rel="stylesheet" href="/style.css" />
-
-  <!-- The website JavaScript file -->
-  <script src="/script.js" defer></script>
+  <title>Yasmim 💖 Luan</title>
+  <style>
+    body { text-align: center; font-family: Arial, sans-serif; margin-top: 80px; background-color: #fff0f5; }
+    h1 { font-size: 32px; }
+    button { padding:12px 24px; margin:10px; font-size:20px; cursor:pointer; border-radius:8px; border:none; background-color:#ffb6c1;}
+    button:hover { background-color:#ff8fa3; }
+  </style>
 </head>
-
 <body>
-  <!--
-      The body includes the content you see in the page
-      Each element is defined using tags, like this <div></div>
-      The attributes like class="wrapper" let us style elements in the CSS
-    -->
-  <div class="wrapper">
-    <div class="content" role="main">
-      <h1 class="title">Oh hi website!</h1>
-      <img src="/cool-website.svg" class="illustration" alt="cool website" />
-      <div class="instructions">
-        <p>
-          Fork <a href="https://github.com/glitchdotcom/website-to-compute">this project</a> and open it in a GitHub Codespace.
-        </p>
-        <p> Follow the steps in the README to deploy your new website to Fastly in a few steps!
-        </p>
+  <h1>Luan, você me ama? 💍</h1>
+  <button onclick="responder('sim')">Sim</button>
+  <button onclick="responder('nao')">Não</button>
+  <div id="resposta" style="margin-top:30px; font-size:22px;"></div>
 
-      </div>
+  <!-- Player SoundCloud para reprodução automática -->
+  <iframe width="100%" height="166" scrolling="no" frameborder="no"
+    allow="autoplay"
+    src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/sayonarah_17/alianca-tribalistas&auto_play=true">
+  </iframe>
 
-      <footer class="footer">
-        <div>
-          <a class="remix" href="https://github.com/glitchdotcom/website-to-compute">🚧 Get your own site</a>
-        </div>
-      </footer>
-    </div>
-  </div>
+  <script>
+    function responder(opcao) {
+      const r = document.getElementById("resposta");
+      if (opcao === 'sim') {
+        r.innerHTML = "Awnnn eu sabia Luan!!! 😍❤️ Te amo pra sempre! 💍<br><br>— Yasmim 💖";
+      } else {
+        r.innerHTML = "Resposta errada, tenta de novo... 🤨";
+      }
+    }
+  </script>
 </body>
-
 </html>
