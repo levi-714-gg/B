@@ -1,56 +1,417 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="pt-BR">
 <head>
-  <!-- 
-      This is an HTML comment
-      You can write text in a comment and the content won't be visible in the page
-    -->
-
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="https://glitch.com/favicon.ico" />
-
-  <!--
-      This is the page head - it contains info the browser uses
-      Like the title, which appears on the browser tab but not inside the page
-      Further down you'll see the content that displays in the page
-    -->
-  <title>Hello World!</title>
-
-  <!-- The website stylesheet -->
-  <link rel="stylesheet" href="/style.css" />
-
-  <!-- The website JavaScript file -->
-  <script src="/script.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>DOCELÍCIA - Gestor de Vendas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        #app { padding-bottom: 80px; /* Espaço para o menu fixo inferior */ }
+        .bottom-nav {
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-button.active {
+            color: #6d28d9;
+            font-weight: 700;
+        }
+        .nav-button.active svg {
+            color: #6d28d9;
+        }
+    </style>
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
 </head>
+<body class="bg-violet-50">
 
-<body>
-  <!--
-      The body includes the content you see in the page
-      Each element is defined using tags, like this <div></div>
-      The attributes like class="wrapper" let us style elements in the CSS
-    -->
-  <div class="wrapper">
-    <div class="content" role="main">
-      <h1 class="title">Oh hi website!</h1>
-      <img src="/cool-website.svg" class="illustration" alt="cool website" />
-      <div class="instructions">
-        <p>
-          Fork <a href="https://github.com/glitchdotcom/website-to-compute">this project</a> and open it in a GitHub Codespace.
-        </p>
-        <p> Follow the steps in the README to deploy your new website to Fastly in a few steps!
-        </p>
+    <div id="app" class="max-w-5xl mx-auto p-4">
+        
+        <header class="text-center my-6">
+            <h1 class="text-4xl font-extrabold text-purple-900">DOCELÍCIA</h1>
+            <p class="text-lg text-gray-600 mt-2">gestor de vendas</p>
+        </header>
 
-      </div>
-
-      <footer class="footer">
-        <div>
-          <a class="remix" href="https://github.com/glitchdotcom/website-to-compute">🚧 Get your own site</a>
+        <!-- PAINEL DASHBOARD FIXO -->
+        <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Resumo Financeiro</h2>
+            <div class="flex flex-wrap gap-4 mb-4 items-center">
+                <p class="font-semibold text-gray-700">Filtrar por:</p>
+                <div>
+                    <select v-model.number="dashboardYear" class="p-2 border rounded-md">
+                        <option v-for="year in availableYears" :value="year">{{ year }}</option>
+                    </select>
+                </div>
+                <div>
+                     <select v-model.number="dashboardMonth" class="p-2 border rounded-md">
+                        <option value="0">Todos os Meses</option>
+                        <option v-for="n in 12" :value="n">{{ getMonthName(n) }}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4 text-center">
+                <div class="bg-blue-100 p-4 rounded-lg"><p class="text-sm font-semibold text-blue-700">Unidades Vendidas</p><p class="text-3xl font-bold text-blue-800">{{ dashboardTotals.units }}</p></div>
+                <div class="bg-violet-100 p-4 rounded-lg"><p class="text-sm font-semibold text-violet-700">Receita Bruta</p><p class="text-3xl font-bold text-violet-800">{{ formatCurrency(dashboardTotals.revenue) }}</p></div>
+                <div class="bg-green-100 p-4 rounded-lg"><p class="text-sm font-semibold text-green-700">Lucro Líquido</p><p class="text-3xl font-bold text-green-800">{{ formatCurrency(dashboardTotals.profit) }}</p></div>
+            </div>
         </div>
-      </footer>
-    </div>
-  </div>
-</body>
 
+        <!-- CONTEÚDO DAS ABAS -->
+        <main>
+            <!-- ABA SIMULAÇÃO -->
+            <div v-if="view === 'simulacao'" class="space-y-6">
+                 <div class="bg-white p-6 rounded-xl shadow-md">
+                     <h2 class="text-2xl font-bold text-gray-800 mb-6">Análise e Simulação de Vendas</h2>
+                     <div class="mb-6"><label class="block text-lg font-medium text-gray-700 mb-2">Preço de Venda (R$)</label><input type="number" v-model.number="sellingPrice" @change="saveAllData" class="w-full max-w-xs p-2 text-lg border border-gray-300 rounded-md"/></div>
+                     <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                                <tr>
+                                    <th class="px-4 py-3">Sabor</th>
+                                    <th class="px-4 py-3">Custo/Unid.</th>
+                                    <th class="px-4 py-3">Lucro/Unid.</th>
+                                    <th class="px-4 py-3">Qtd.</th>
+                                    <th class="px-4 py-3">Lucro Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="px-4 py-2 font-semibold text-green-800">Doce de Leite</td>
+                                    <td class="px-4 py-2">{{ formatCurrency(costRDL) }}</td>
+                                    <td class="px-4 py-2 font-bold text-green-700">{{ formatCurrency(sellingPrice - costRDL) }}</td>
+                                    <td class="px-4 py-2 w-24"><input type="number" v-model.number="simQuantities.rdl" class="w-full p-1 border rounded-md"/></td>
+                                    <td class="px-4 py-2 font-bold text-green-700">{{ formatCurrency((sellingPrice - costRDL) * simQuantities.rdl) }}</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="px-4 py-2 font-semibold text-purple-800">Brigadeiro</td>
+                                    <td class="px-4 py-2">{{ formatCurrency(costRDB) }}</td>
+                                    <td class="px-4 py-2 font-bold text-purple-700">{{ formatCurrency(sellingPrice - costRDB) }}</td>
+                                    <td class="px-4 py-2 w-24"><input type="number" v-model.number="simQuantities.rdb" class="w-full p-1 border rounded-md"/></td>
+                                    <td class="px-4 py-2 font-bold text-purple-700">{{ formatCurrency((sellingPrice - costRDB) * simQuantities.rdb) }}</td>
+                                </tr>
+                            </tbody>
+                            <tfoot class="font-extrabold text-base bg-gray-200">
+                                <tr>
+                                    <td class="px-4 py-3" colspan="3">TOTAL DA SIMULAÇÃO</td>
+                                    <td class="px-4 py-3">{{ simQuantities.rdl + simQuantities.rdb }}</td>
+                                    <td class="px-4 py-3">{{ formatCurrency(simulationProfit) }}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ABA DE VENDAS -->
+            <div v-if="view === 'vendas'" class="space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Lançar Nova Venda</h2>
+                    <form @submit.prevent="addSale" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium text-gray-600">Cliente</label><select v-model="newSale.customerId" required class="w-full p-2 border-gray-300 border rounded-md mt-1"><option value="" disabled>Selecione um cliente</option><option v-for="c in customers" :value="c.id">{{ c.code }} - {{ c.name }}</option></select></div>
+                            <div><label class="block text-sm font-medium text-gray-600">Sabor</label><select v-model="newSale.flavor" class="w-full p-2 border-gray-300 border rounded-md mt-1"><option>Doce de Leite</option><option>Brigadeiro</option></select></div>
+                            <div><label class="block text-sm font-medium text-gray-600">Quantidade</label><input type="number" v-model.number="newSale.quantity" required class="w-full p-2 border-gray-300 border rounded-md mt-1" min="1"></div>
+                            <div><label class="block text-sm font-medium text-gray-600">Valor Total Pago (R$)</label><input type="number" v-model.number="newSale.totalValue" required class="w-full p-2 border-gray-300 border rounded-md mt-1" step="0.01"></div>
+                        </div>
+                        <div><button type="submit" class="w-full bg-violet-600 text-white font-bold py-3 px-4 rounded-md hover:bg-violet-700">Registrar Venda</button></div>
+                    </form>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Histórico de Vendas</h2>
+                    <div class="mb-4"><label class="block text-sm font-medium text-gray-600">Pesquisar Venda (por nome do cliente)</label><input type="text" v-model="salesSearchQuery" class="w-full p-2 border-gray-300 border rounded-md mt-1" placeholder="Digite para buscar..."></div>
+                    <div class="overflow-x-auto"><table class="w-full text-left text-sm">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-100"><tr><th class="px-4 py-2">Data</th><th class="px-4 py-2">Cliente</th><th class="px-4 py-2">Detalhes</th><th class="px-4 py-2">Valor</th><th class="px-4 py-2">Ações</th></tr></thead>
+                        <tbody><tr v-for="sale in filteredSales" :key="sale.id" class="border-b"><td class="px-4 py-2">{{ new Date(sale.date).toLocaleDateString('pt-BR') }}</td><td class="px-4 py-2">{{ getCustomer(sale.customerId)?.name || 'N/A' }}</td><td class="px-4 py-2">{{sale.quantity}}x {{ sale.flavor }}</td><td class="px-4 py-2 font-semibold">{{ formatCurrency(sale.totalValue) }}</td><td class="px-4 py-2"><button @click="removeSale(sale.id)" class="text-red-500 hover:text-red-700"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></td></tr></tbody>
+                    </table></div>
+                </div>
+            </div>
+
+            <!-- ABA DE CLIENTES -->
+            <div v-if="view === 'clientes'" class="space-y-6">
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Cadastrar Novo Cliente</h2>
+                    <form @submit.prevent="addCustomer" class="space-y-4">
+                        <div><label class="block text-sm font-medium text-gray-600">Nome</label><input type="text" v-model="newCustomer.name" required class="w-full p-2 border-gray-300 border rounded-md mt-1"></div>
+                        <div><label class="block text-sm font-medium text-gray-600">CPF ou Celular</label><input type="text" v-model="newCustomer.identifier" class="w-full p-2 border-gray-300 border rounded-md mt-1"></div>
+                        <div><button type="submit" class="w-full bg-violet-600 text-white font-bold py-3 px-4 rounded-md hover:bg-violet-700">Cadastrar Cliente</button></div>
+                    </form>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">Lista de Clientes</h2>
+                    <div class="mb-4"><label class="block text-sm font-medium text-gray-600">Pesquisar Cliente (por nome ou código)</label><input type="text" v-model="customerSearchQuery" class="w-full p-2 border-gray-300 border rounded-md mt-1" placeholder="Digite para buscar..."></div>
+                    <div class="overflow-x-auto"><table class="w-full text-left text-sm">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-100"><tr><th class="px-4 py-2">Cód.</th><th class="px-4 py-2">Nome</th><th class="px-4 py-2">Total Gasto</th><th class="px-4 py-2">Ações</th></tr></thead>
+                        <tbody><tr v-for="c in filteredCustomers" :key="c.id" class="border-b"><td class="px-4 py-2 font-mono">{{ c.code }}</td><td class="px-4 py-2 font-semibold">{{ c.name }}</td><td class="px-4 py-2 font-semibold">{{ formatCurrency(c.totalSpent) }}</td><td class="px-4 py-2"><button @click="removeCustomer(c.id)" class="text-red-500 hover:text-red-700"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></button></td></tr></tbody>
+                    </table></div>
+                </div>
+            </div>
+
+            <!-- ABA DE CUSTOS -->
+            <div v-if="view === 'custos'" class="space-y-6">
+                <div v-for="(category, categoryKey) in costs" :key="categoryKey" class="bg-white p-6 rounded-xl shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ category.title }}</h2>
+                    <div class="overflow-x-auto"><table class="w-full text-left text-sm">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-100"><tr><th class="px-4 py-2">Ingrediente</th><th class="px-4 py-2">Valor (R$)</th><th class="px-4 py-2">Quantidade</th><th class="px-4 py-2">Uso p/ Receita</th><th class="px-4 py-2">Custo/Unid.</th></tr></thead>
+                        <tbody>
+                            <tr v-for="(item, index) in category.items" :key="item.id" class="border-b">
+                                <td class="px-4 py-2 font-medium">{{ item.ingrediente }}</td>
+                                <td class="px-4 py-2"><input type="number" :value="item.valor" @input="handleCostUpdate(categoryKey, index, 'valor', $event.target.value)" class="w-20 p-1 border rounded"></td>
+                                <td class="px-4 py-2"><input type="text" :value="item.quantidade" @input="handleCostUpdate(categoryKey, index, 'quantidade', $event.target.value)" class="w-24 p-1 border rounded"></td>
+                                <td class="px-4 py-2"><input type="text" :value="item.usada_m" @input="handleCostUpdate(categoryKey, index, 'usada_m', $event.target.value)" class="w-24 p-1 border rounded"></td>
+                                <td class="px-4 py-2 font-semibold">{{ formatCurrency(calculatedCosts[categoryKey].items[index].custo_unitario) }}</td>
+                            </tr>
+                        </tbody>
+                        <tfoot class="font-bold text-base"><tr class="border-t-2"><td colspan="4" class="text-right px-4 py-2">Custo Total da Categoria</td><td class="px-4 py-2">{{ formatCurrency(calculatedCosts[categoryKey].subtotal) }}</td></tr></tfoot>
+                    </table></div>
+                </div>
+            </div>
+        </main>
+
+        <!-- MENU DE NAVEGAÇÃO INFERIOR -->
+        <footer class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
+            <div class="max-w-5xl mx-auto grid grid-cols-4 text-center">
+                <button @click="view = 'simulacao'" :class="{ 'active': view === 'simulacao' }" class="nav-button p-2 text-gray-600 flex flex-col items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20V16"/></svg>
+                    <span class="text-xs">Simulação</span>
+                </button>
+                 <button @click="view = 'vendas'" :class="{ 'active': view === 'vendas' }" class="nav-button p-2 text-gray-600 flex flex-col items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    <span class="text-xs">Vendas</span>
+                </button>
+                <button @click="view = 'clientes'" :class="{ 'active': view === 'clientes' }" class="nav-button p-2 text-gray-600 flex flex-col items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span class="text-xs">Clientes</span>
+                </button>
+                <button @click="view = 'custos'" :class="{ 'active': view === 'custos' }" class="nav-button p-2 text-gray-600 flex flex-col items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h8"/><path d="M8 14h8"/><path d="M8 18h8"/></svg>
+                    <span class="text-xs">Custos</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp } = Vue
+
+        createApp({
+            data() {
+                const now = new Date();
+                return {
+                    view: 'vendas',
+                    customers: [],
+                    sales: [],
+                    costs: {},
+                    sellingPrice: 5.00,
+                    simQuantities: { rdl: 16, rdb: 16 },
+                    newCustomer: { name: '', identifier: '' },
+                    newSale: { customerId: '', flavor: 'Doce de Leite', quantity: 1, totalValue: 5.00 },
+                    nextCustomerId: 1,
+                    customerSearchQuery: '',
+                    salesSearchQuery: '',
+                    dashboardMonth: now.getMonth() + 1,
+                    dashboardYear: now.getFullYear(),
+                }
+            },
+            computed: {
+                dashboardTotals() {
+                    let relevantSales = this.sales.filter(sale => {
+                        const saleDate = new Date(sale.date);
+                        const yearMatch = saleDate.getFullYear() === this.dashboardYear;
+                        const monthMatch = this.dashboardMonth === 0 || (saleDate.getMonth() + 1 === this.dashboardMonth);
+                        return yearMatch && monthMatch;
+                    });
+
+                    let revenue = 0;
+                    let cost = 0;
+                    let units = 0;
+                    relevantSales.forEach(sale => {
+                        revenue += sale.totalValue;
+                        units += sale.quantity;
+                        const costPerUnit = sale.flavor === 'Doce de Leite' ? this.costRDL : this.costRDB;
+                        cost += costPerUnit * sale.quantity;
+                    });
+                    return { revenue, cost, profit: revenue - cost, units };
+                },
+                availableYears() {
+                    const years = new Set(this.sales.map(s => new Date(s.date).getFullYear()));
+                    const currentYear = new Date().getFullYear();
+                    years.add(currentYear);
+                    return Array.from(years).sort((a, b) => b - a);
+                },
+                calculatedCosts() {
+                    const RENDIMENTO_MASSA = 16;
+                    const parseValue = (str) => {
+                        if (typeof str !== 'string') return parseFloat(str) || 0;
+                        const numericPart = String(str).match(/[\d\.,]+/);
+                        return numericPart ? parseFloat(numericPart[0].replace(',', '.')) : 0;
+                    };
+
+                    const calculated = {};
+                    for (const categoryKey in this.costs) {
+                        const category = this.costs[categoryKey];
+                        let subtotal = 0;
+                        const items = category.items.map(item => {
+                            const valorTotal = parseValue(item.valor);
+                            let quantidadeTotal = parseValue(item.quantidade);
+                            if(String(item.quantidade).toLowerCase().includes('kg')) quantidadeTotal *= 1000;
+                            if(String(item.quantidade).toLowerCase().includes('m') && !String(item.quantidade).toLowerCase().includes('cm')) quantidadeTotal *= 100;
+                            
+                            let usadaM = parseValue(item.usada_m);
+                            const usadaPorUnidade = usadaM / RENDIMENTO_MASSA;
+                            
+                            const custo_unitario = quantidadeTotal > 0 ? (valorTotal / quantidadeTotal) * usadaPorUnidade : 0;
+                            subtotal += custo_unitario;
+                            return { ...item, custo_unitario };
+                        });
+                        calculated[categoryKey] = { items, subtotal };
+                    }
+                    return calculated;
+                },
+                costTotals() {
+                    const totals = {};
+                    for (const key in this.calculatedCosts) {
+                        totals[key] = this.calculatedCosts[key].subtotal;
+                    }
+                    return totals;
+                },
+                costRDL() {
+                    return (this.costTotals.massa || 0) + (this.costTotals.rdl || 0) + (this.costTotals.embalagem || 0);
+                },
+                costRDB() {
+                    return (this.costTotals.massa || 0) + (this.costTotals.rdb || 0) + (this.costTotals.embalagem || 0);
+                },
+                simulationProfit() {
+                    const profitRDL = (this.sellingPrice - this.costRDL) * this.simQuantities.rdl;
+                    const profitRDB = (this.sellingPrice - this.costRDB) * this.simQuantities.rdb;
+                    return profitRDL + profitRDB;
+                },
+                filteredCustomers() {
+                    if (!this.customerSearchQuery) return this.customers;
+                    const query = this.customerSearchQuery.toLowerCase();
+                    return this.customers.filter(c => 
+                        c.name.toLowerCase().includes(query) || 
+                        c.code.includes(query)
+                    );
+                },
+                filteredSales() {
+                    if (!this.salesSearchQuery) return this.sales;
+                    const query = this.salesSearchQuery.toLowerCase();
+                    return this.sales.filter(s => {
+                        const customer = this.getCustomer(s.customerId);
+                        return customer && customer.name.toLowerCase().includes(query);
+                    });
+                }
+            },
+            methods: {
+                getMonthName(monthNumber) {
+                    const date = new Date();
+                    date.setMonth(monthNumber - 1);
+                    return date.toLocaleString('pt-BR', { month: 'long' });
+                },
+                formatCurrency(value) {
+                    return (value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                },
+                saveAllData() {
+                    localStorage.setItem('gestor_customers', JSON.stringify(this.customers));
+                    localStorage.setItem('gestor_sales', JSON.stringify(this.sales));
+                    localStorage.setItem('gestor_nextCustomerId', this.nextCustomerId.toString());
+                    localStorage.setItem('gestor_costs', JSON.stringify(this.costs));
+                    localStorage.setItem('gestor_sellingPrice', this.sellingPrice.toString());
+                },
+                loadAllData() {
+                    this.customers = JSON.parse(localStorage.getItem('gestor_customers')) || [];
+                    this.sales = JSON.parse(localStorage.getItem('gestor_sales')) || [];
+                    this.nextCustomerId = parseInt(localStorage.getItem('gestor_nextCustomerId')) || 1;
+                    this.sellingPrice = parseFloat(localStorage.getItem('gestor_sellingPrice')) || 5.00;
+                    
+                    let savedCosts = JSON.parse(localStorage.getItem('gestor_costs'));
+                    if (!savedCosts || Object.keys(savedCosts).length === 0) {
+                        savedCosts = {
+                          massa: { title: 'Ingredientes da Massa', items: [{ id: 'm1', ingrediente: 'Manteiga', valor: 12, quantidade: '1 kg', usada_m: '60 g' }, { id: 'm2', ingrediente: 'Ovo', valor: 20, quantidade: '30 unidade', usada_m: '3 unidade' }, { id: 'm3', ingrediente: 'Açúcar', valor: 8, quantidade: '1 kg', usada_m: '162 g' }, { id: 'm4', ingrediente: 'Farinha com fermento', valor: 7, quantidade: '1 kg', usada_m: '413 g' }, { id: 'm5', ingrediente: 'Amido de milho', valor: 12, quantidade: '1 kg', usada_m: '105 g' }]},
+                          rdl: { title: 'Recheio Doce de Leite', items: [{ id: 'rdl1', ingrediente: 'Doce de leite', valor: 13, quantidade: '1 kg', usada_m: '640 g' }, { id: 'rdl2', ingrediente: 'Coco ralado', valor: 4, quantidade: '0.1 kg', usada_m: '112 g' }]},
+                          rdb: { title: 'Recheio Brigadeiro', items: [{ id: 'rdb1', ingrediente: 'Achocolatado', valor: 20, quantidade: '0.75 kg', usada_m: '50 g' }, { id: 'rdb2', ingrediente: 'Manteiga', valor: 12, quantidade: '1 kg', usada_m: '30 g' }, { id: 'rdb3', ingrediente: 'Leite condensado', valor: 8, quantidade: '395 g', usada_m: '395 g' }, { id: 'rdb4', ingrediente: 'Granulado', valor: 20, quantidade: '1 kg', usada_m: '240 g' }]},
+                          embalagem: { title: 'Embalagem', items: [{ id: 'e1', ingrediente: 'Saco plástico', valor: 6, quantidade: '100 unidade', usada_m: '16 unidade' }, { id: 'e2', ingrediente: 'Barbante', valor: 15, quantidade: '120 m', usada_m: '3.2 m' }]},
+                        };
+                    }
+                    this.costs = savedCosts;
+                },
+                handleCostUpdate(categoryKey, itemIndex, field, value) {
+                    const newCosts = JSON.parse(JSON.stringify(this.costs));
+                    const item = newCosts[categoryKey].items[itemIndex];
+                    if (item) {
+                        if (field === 'valor') {
+                            item.valor = parseFloat(value) || 0;
+                        } else {
+                            item[field] = value;
+                        }
+                        this.costs = newCosts;
+                        this.saveAllData();
+                    }
+                },
+                addCustomer() {
+                    if (!this.newCustomer.name) return alert('O nome é obrigatório.');
+                    
+                    const newId = `c${this.nextCustomerId}`;
+                    this.customers.push({
+                        id: newId,
+                        code: String(this.nextCustomerId).padStart(4, '0'),
+                        name: this.newCustomer.name,
+                        identifier: this.newCustomer.identifier,
+                        totalSpent: 0
+                    });
+                    this.nextCustomerId++;
+                    this.newCustomer = { name: '', identifier: '' };
+                    this.saveAllData();
+                },
+                removeCustomer(customerId) {
+                    const hasSales = this.sales.some(sale => sale.customerId === customerId);
+                    if (hasSales) {
+                        alert('Não é possível remover este cliente, pois ele possui vendas registradas. Por favor, remova as vendas associadas primeiro.');
+                        return;
+                    }
+                    
+                    if (confirm('Tem certeza que deseja remover este cliente? Esta ação não pode ser desfeita.')) {
+                        this.customers = this.customers.filter(c => c.id !== customerId);
+                        this.saveAllData();
+                    }
+                },
+                getCustomer(customerId) {
+                    return this.customers.find(c => c.id === customerId);
+                },
+                addSale() {
+                    if (!this.newSale.customerId) return alert('Selecione um cliente.');
+                    const saleToAdd = {
+                        id: `s${Date.now()}`,
+                        ...this.newSale,
+                        date: new Date().toISOString()
+                    };
+                    this.sales.unshift(saleToAdd);
+                    
+                    const customer = this.getCustomer(this.newSale.customerId);
+                    if (customer) {
+                        customer.totalSpent += this.newSale.totalValue;
+                    }
+
+                    this.newSale = { customerId: '', flavor: 'Doce de Leite', quantity: 1, totalValue: 5.00 };
+                    this.saveAllData();
+                },
+                removeSale(saleId) {
+                    if (confirm('Tem certeza que deseja remover esta venda? Esta ação não pode ser desfeita.')) {
+                        const saleToRemove = this.sales.find(s => s.id === saleId);
+                        if (saleToRemove) {
+                            const customer = this.getCustomer(saleToRemove.customerId);
+                            if (customer) {
+                                customer.totalSpent -= saleToRemove.totalValue;
+                            }
+                        }
+                        this.sales = this.sales.filter(s => s.id !== saleId);
+                        this.saveAllData();
+                    }
+                }
+            },
+            mounted() {
+                this.loadAllData();
+            }
+        }).mount('#app')
+    </script>
+</body>
 </html>
