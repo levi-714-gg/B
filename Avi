@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aviator Live Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #ffffff;
+      margin: 0;
+      padding: 1rem;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    input, button, select {
+      padding: 0.5rem;
+      margin: 0.25rem;
+      border-radius: 5px;
+      border: none;
+      font-size: 1rem;
+    }
+    button {
+      background-color: #1e90ff;
+      color: #fff;
+      cursor: pointer;
+    }
+    .win { color: #00ff00; font-weight: bold; }
+    .loss { color: #ff4444; font-weight: bold; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      padding: 0.5rem;
+      border: 1px solid #333;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>Aviator Game Tracker</h2>
+  <label>Round Multiplier: <input type="number" step="0.01" id="multiplier" /></label><br>
+  <label>Bet 1: <select id="bet1"><option value="win">✅ Win</option><option value="loss">❌ Loss</option></select></label>
+  <label>Bet 2: <select id="bet2"><option value="win">✅ Win</option><option value="loss">❌ Loss</option></select></label>
+  <button onclick="addRound()">Add Round</button>
+  <button onclick="exportData()">Export CSV</button>
+
+  <table id="history">
+    <thead>
+      <tr><th>Round</th><th>Multiplier</th><th>Bet 1</th><th>Bet 2</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    let roundCount = 1;
+    function addRound() {
+      const multiplier = document.getElementById('multiplier').value;
+      const bet1 = document.getElementById('bet1').value;
+      const bet2 = document.getElementById('bet2').value;
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${roundCount++}</td>
+        <td>${multiplier}x</td>
+        <td class="${bet1 === 'win' ? 'win' : 'loss'}">${bet1 === 'win' ? '✅' : '❌'}</td>
+        <td class="${bet2 === 'win' ? 'win' : 'loss'}">${bet2 === 'win' ? '✅' : '❌'}</td>
+      `;
+      document.querySelector('#history tbody').appendChild(row);
+    }
+
+    function exportData() {
+      const rows = document.querySelectorAll('table tr');
+      let csv = [];
+      rows.forEach(row => {
+        const cols = row.querySelectorAll('td, th');
+        let rowData = [];
+        cols.forEach(col => rowData.push(col.innerText));
+        csv.push(rowData.join(","));
+      });
+      const blob = new Blob([csv.join("\n")], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'aviator_rounds.csv';
+      a.click();
+    }
+  </script>
+</body>
+</html>
