@@ -1,56 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="id">
 <head>
-  <!-- 
-      This is an HTML comment
-      You can write text in a comment and the content won't be visible in the page
-    -->
-
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="https://glitch.com/favicon.ico" />
-
-  <!--
-      This is the page head - it contains info the browser uses
-      Like the title, which appears on the browser tab but not inside the page
-      Further down you'll see the content that displays in the page
-    -->
-  <title>Hello World!</title>
-
-  <!-- The website stylesheet -->
-  <link rel="stylesheet" href="/style.css" />
-
-  <!-- The website JavaScript file -->
-  <script src="/script.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>RiskyTikTokDownloader</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-
-<body>
-  <!--
-      The body includes the content you see in the page
-      Each element is defined using tags, like this <div></div>
-      The attributes like class="wrapper" let us style elements in the CSS
-    -->
-  <div class="wrapper">
-    <div class="content" role="main">
-      <h1 class="title">Oh hi website!</h1>
-      <img src="/cool-website.svg" class="illustration" alt="cool website" />
-      <div class="instructions">
-        <p>
-          Fork <a href="https://github.com/glitchdotcom/website-to-compute">this project</a> and open it in a GitHub Codespace.
-        </p>
-        <p> Follow the steps in the README to deploy your new website to Fastly in a few steps!
-        </p>
-
-      </div>
-
-      <footer class="footer">
-        <div>
-          <a class="remix" href="https://github.com/glitchdotcom/website-to-compute">🚧 Get your own site</a>
-        </div>
-      </footer>
-    </div>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center p-4">
+  <div class="bg-gray-800 p-8 rounded-2xl shadow-xl w-full max-w-md">
+    <h1 class="text-3xl font-bold text-center text-purple-400 mb-6">🎬 RiskyTikTokDownloader</h1>
+    <form id="downloadForm" class="space-y-4">
+      <input type="text" id="tiktokUrl" placeholder="Tempel link TikTok..." class="w-full px-4 py-3 rounded-lg bg-gray-700 text-white" required>
+      <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 py-3 rounded-lg font-semibold">Download</button>
+    </form>
+    <div id="result" class="mt-6 hidden text-center space-y-4"></div>
   </div>
-</body>
 
+  <script>
+    const form = document.getElementById('downloadForm');
+    const result = document.getElementById('result');
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const inputUrl = document.getElementById('tiktokUrl').value.trim();
+      result.innerHTML = '';
+      result.classList.add('hidden');
+
+      if (!inputUrl.includes('tiktok.com')) {
+        return Swal.fire('Error', 'Link TikTok tidak valid!', 'error');
+      }
+
+      Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+      try {
+        let finalUrl = inputUrl;
+        if (inputUrl.includes('vt.tiktok.com')) {
+          const red = await fetch(inputUrl, { method: 'HEAD', redirect: 'follow' });
+          finalUrl = red.url;
+        }
+
+        const apiRes = await fetch(`https://tikwm.com/api/?url=${encodeURIComponent(finalUrl)}`);
+        const data = await apiRes.json();
+
+        if (!data.data || !data.data.play) {
+          throw new Error('Video tidak ditemukan.');
+        }
+
+        Swal.close();
+
+        const video = document.createElement('video');
+        video.controls = true;
+        video.src = data.data.play;
+        video.className = 'mx-auto rounded-lg w-full';
+
+        const btn = document.createElement('a');
+        btn.href = data.data.play;
+        btn.download = 'tiktok_video.mp4';
+        btn.innerText = '⬇️ Download Video Tanpa Watermark';
+        btn.className = 'inline-block bg-green-600 hover:bg-green-700 px-6 py-2 mt-4 rounded-lg';
+
+        result.append(video, btn);
+        result.classList.remove('hidden');
+      } catch (err) {
+        console.error(err);
+        Swal.fire('Gagal', err.message || 'Terjadi kesalahan.', 'error');
+      }
+    });
+  </script>
+</body>
 </html>
