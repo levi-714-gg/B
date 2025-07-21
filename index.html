@@ -1,56 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <!-- 
-      This is an HTML comment
-      You can write text in a comment and the content won't be visible in the page
-    -->
-
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="https://glitch.com/favicon.ico" />
-
-  <!--
-      This is the page head - it contains info the browser uses
-      Like the title, which appears on the browser tab but not inside the page
-      Further down you'll see the content that displays in the page
-    -->
-  <title>Hello World!</title>
-
-  <!-- The website stylesheet -->
-  <link rel="stylesheet" href="/style.css" />
-
-  <!-- The website JavaScript file -->
-  <script src="/script.js" defer></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Psychotherapist</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f6fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .chat-container {
+      width: 400px;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .messages {
+      padding: 20px;
+      height: 400px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .message {
+      padding: 10px 15px;
+      border-radius: 15px;
+      max-width: 80%;
+    }
+    .user {
+      align-self: flex-end;
+      background-color: #d1d8e0;
+    }
+    .bot {
+      align-self: flex-start;
+      background-color: #a29bfe;
+      color: white;
+    }
+    .input-area {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+    input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      outline: none;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #6c5ce7;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
 </head>
-
 <body>
-  <!--
-      The body includes the content you see in the page
-      Each element is defined using tags, like this <div></div>
-      The attributes like class="wrapper" let us style elements in the CSS
-    -->
-  <div class="wrapper">
-    <div class="content" role="main">
-      <h1 class="title">Oh hi website!</h1>
-      <img src="/cool-website.svg" class="illustration" alt="cool website" />
-      <div class="instructions">
-        <p>
-          Fork <a href="https://github.com/glitchdotcom/website-to-compute">this project</a> and open it in a GitHub Codespace.
-        </p>
-        <p> Follow the steps in the README to deploy your new website to Fastly in a few steps!
-        </p>
-
-      </div>
-
-      <footer class="footer">
-        <div>
-          <a class="remix" href="https://github.com/glitchdotcom/website-to-compute">🚧 Get your own site</a>
-        </div>
-      </footer>
+  <div class="chat-container">
+    <div class="messages" id="messages">
+      <div class="message bot">Hello! I'm your Therapy Assistant. How are you feeling today?</div>
+    </div>
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Type your message..." />
+      <button onclick="sendMessage()">Send</button>
     </div>
   </div>
-</body>
 
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById('userInput');
+      const message = input.value.trim();
+      if (!message) return;
+
+      appendMessage(message, 'user');
+      input.value = '';
+
+      try {
+        const res = await fetch(`https://magicloops.dev/api/loop/830852e4-478c-42c4-8dbd-6a80fe9ea55f/run?input=${encodeURIComponent(message)}`);
+        const data = await res.json();
+        appendMessage(data.output || "I'm here to support you.", 'bot');
+      } catch (err) {
+        console.error(err);
+        appendMessage("Sorry, I couldn't reach the server.", 'bot');
+      }
+    }
+
+    function appendMessage(text, type) {
+      const messageBox = document.createElement('div');
+      messageBox.className = `message ${type}`;
+      messageBox.textContent = text;
+      document.getElementById('messages').appendChild(messageBox);
+      messageBox.scrollIntoView({ behavior: "smooth" });
+    }
+  </script>
+</body>
 </html>
