@@ -1,0 +1,17 @@
+flask-smart-talk/
+│
+├── app.py                # Main Flask app (handles routes like login, register)
+├── requirements.txt      # List of Python dependencies (Flask, etc.)
+├── smarttalk.db          # SQLite database (auto-created if missing)
+├── README.md             # Instructions on running & deploying
+│
+├── templates/            # All HTML pages
+│   ├── index.html        # Home page
+│   ├── about.html        # About page
+│   ├── contact.html      # Contact page
+│   ├── login.html        # Login page
+│   ├── register.html     # Register page
+│   ├── dashboard.html    # After login page (Home, Chat, Notifications, Post)
+│
+└── static/
+    └── style.css         # CSS styling
