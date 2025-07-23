@@ -1,56 +1,184 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="ar" dir="rtl">
 <head>
-  <!-- 
-      This is an HTML comment
-      You can write text in a comment and the content won't be visible in the page
-    -->
-
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="https://glitch.com/favicon.ico" />
-
-  <!--
-      This is the page head - it contains info the browser uses
-      Like the title, which appears on the browser tab but not inside the page
-      Further down you'll see the content that displays in the page
-    -->
-  <title>Hello World!</title>
-
-  <!-- The website stylesheet -->
-  <link rel="stylesheet" href="/style.css" />
-
-  <!-- The website JavaScript file -->
-  <script src="/script.js" defer></script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>أكاديمية سويمر</title>
+  <link rel="stylesheet" href="/styles.css"/>
 </head>
-
 <body>
-  <!--
-      The body includes the content you see in the page
-      Each element is defined using tags, like this <div></div>
-      The attributes like class="wrapper" let us style elements in the CSS
-    -->
-  <div class="wrapper">
-    <div class="content" role="main">
-      <h1 class="title">Oh hi website!</h1>
-      <img src="/cool-website.svg" class="illustration" alt="cool website" />
-      <div class="instructions">
-        <p>
-          Fork <a href="https://github.com/glitchdotcom/website-to-compute">this project</a> and open it in a GitHub Codespace.
-        </p>
-        <p> Follow the steps in the README to deploy your new website to Fastly in a few steps!
-        </p>
+  <div class="toast" id="saveToast"></div>
+  <nav class="top-nav" id="topNav">
+    <button class="nav-btn" onclick="showPage('register')">تسجيل</button>
+    <button class="nav-btn admin-only" onclick="showPage('members')">الأعضاء</button>
+    <button class="nav-btn admin-or-aya" onclick="showPage('childrenSwimming')">سباحة الأطفال</button>
+    <button class="nav-btn admin-only" onclick="showPage('monthlyReport')">التقرير الشهري</button>
+    <button class="nav-btn" onclick="logout()">تسجيل الخروج</button>
+  </nav>
 
-      </div>
-
-      <footer class="footer">
-        <div>
-          <a class="remix" href="https://github.com/glitchdotcom/website-to-compute">🚧 Get your own site</a>
-        </div>
-      </footer>
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="hideLoginModal()">×</span>
+      <h2>تسجيل الدخول</h2>
+      <input type="text" id="username" placeholder="اسم المستخدم" required/>
+      <input type="password" id="password" placeholder="كلمة المرور" required/>
+      <button onclick="login()">تسجيل الدخول</button>
     </div>
   </div>
-</body>
 
+  <div class="page-section" id="register">
+    <h2>تسجيل مشترك جديد</h2>
+    <form id="registerForm">
+      <label>الاسم الثلاثي:</label><input type="text" name="name" required/>
+      <label>العمر:</label><input type="number" name="age" required/>
+      <label>رقم الجوال:</label><input type="tel" name="phone" required/>
+      <label>النشاط:</label>
+      <input type="checkbox" name="activity" value="سباحة أطفال"/> سباحة أطفال
+      <input type="checkbox" name="activity" value="كورة"/> كورة
+      <input type="checkbox" name="activity" value="كاراتيه"/> كاراتيه
+      <input type="checkbox" name="activity" value="جمباز"/> جمباز
+      <input type="checkbox" name="activity" value="سباحة سيدات"/> سباحة سيدات
+      <input type="checkbox" name="activity" value="كرة سلة"/> كرة سلة
+      <input type="checkbox" name="activity" value="قدم بنات"/> قدم بنات
+      <label>أيام الاشتراك:</label>
+      <input type="checkbox" name="days" value="السبت"/> السبت
+      <input type="checkbox" name="days" value="الأحد"/> الأحد
+      <input type="checkbox" name="days" value="الإثنين"/> الإثنين
+      <input type="checkbox" name="days" value="الثلاثاء"/> الثلاثاء
+      <input type="checkbox" name="days" value="الأربعاء"/> الأربعاء
+      <input type="checkbox" name="days" value="الخميس"/> الخميس
+      <label>التوقيت:</label>
+      <select name="timing" required>
+        <option value="">اختر توقيت</option>
+        <option value="٤ مساءً">٤ مساءً</option>
+        <option value="٥ مساءً">٥ مساءً</option>
+        <option value="٦ مساءً">٦ مساءً</option>
+        <option value="٧ مساءً">٧ مساءً</option>
+        <option value="٨ مساءً">٨ مساءً</option>
+        <option value="٩ مساءً">٩ مساءً</option>
+      </select>
+      <label>تاريخ الاشتراك:</label><input type="date" name="time"/>
+      <label>بداية الاشتراك:</label><input type="date" name="start"/>
+      <label>نهاية الاشتراك:</label><input type="date" name="end"/>
+      <label>كاش:</label><input type="number" step="0.01" name="cash"/>
+      <label>شبكة:</label><input type="number" step="0.01" name="network"/>
+      <label>المتبقي:</label><input type="number" step="0.01" name="remaining"/>
+      <label>الزي:</label>
+      <input type="checkbox" name="uniform" value="زي كرة القدم"/> زي كرة القدم
+      <input type="checkbox" name="uniform" value="زي الكاراتيه"/> زي الكاراتيه
+      <label>ملاحظات:</label><textarea name="notes"></textarea>
+      <button type="submit" id="saveBtn">حفظ</button>
+      <button type="button" onclick="resetForm()">إعادة تعيين</button>
+      <button type="button" id="editLastBtn" class="admin-only">تعديل آخر إدخال</button>
+      <button type="button" id="renewRegisterBtn">تجديد اشتراك</button>
+    </form>
+  </div>
+
+  <div class="page-section hidden" id="members">
+    <h2>قائمة الأعضاء</h2>
+    <div class="filter-section">
+      <input type="text" id="searchInput" placeholder="ابحث بالاسم..." oninput="applyFilters()"/>
+      <select id="filterActivity" onchange="applyFilters()">
+        <option value="">كل الأنشطة</option>
+        <option value="سباحة أطفال">سباحة أطفال</option>
+        <option value="كورة">كورة</option>
+        <option value="كاراتيه">كاراتيه</option>
+        <option value="جمباز">جمباز</option>
+        <option value="سباحة سيدات">سباحة سيدات</option>
+        <option value="كرة سلة">كرة سلة</option>
+        <option value="قدم بنات">قدم بنات</option>
+      </select>
+      <select id="filterTiming" onchange="applyFilters()">
+        <option value="">كل التوقيتات</option>
+        <option value="٤ مساءً">٤ مساءً</option>
+        <option value="٥ مساءً">٥ مساءً</option>
+        <option value="٦ مساءً">٦ مساءً</option>
+        <option value="٧ مساءً">٧ مساءً</option>
+        <option value="٨ مساءً">٨ مساءً</option>
+        <option value="٩ مساءً">٩ مساءً</option>
+      </select>
+      <select id="filterSubscription" onchange="applyFilters()">
+        <option value="">كل الاشتراكات</option>
+        <option value="active">نشط</option>
+        <option value="expired">منتهي</option>
+        <option value="expiring_today">ينتهي اليوم</option>
+      </select>
+      <button id="copyDataBtn" class="admin-only">نسخ</button>
+      <button id="exportCSVBtn" class="admin-only">تصدير CSV</button>
+    </div>
+    <div id="registrationsTable"></div>
+  </div>
+
+  <div class="page-section hidden" id="childrenSwimming">
+    <h2>سباحة الأطفال</h2>
+    <div class="filter-section">
+      <input type="text" id="searchChildrenInput" placeholder="ابحث بالاسم..." oninput="applyChildrenFilters()"/>
+      <select id="filterChildrenTiming" onchange="applyChildrenFilters()">
+        <option value="">كل التوقيتات</option>
+        <option value="٤ مساءً">٤ مساءً</option>
+        <option value="٥ مساءً">٥ مساءً</option>
+        <option value="٦ مساءً">٦ مساءً</option>
+        <option value="٧ مساءً">٧ مساءً</option>
+        <option value="٨ مساءً">٨ مساءً</option>
+        <option value="٩ مساءً">٩ مساءً</option>
+      </select>
+      <select id="filterCoach" onchange="applyChildrenFilters()">
+        <option value="">كل المدربين</option>
+      </select>
+      <input type="text" id="coachName" placeholder="اسم المدرب"/>
+      <button id="addCoachBtn" class="admin-only">إضافة مدرب</button>
+      <button id="deleteCoachBtn" class="admin-only">حذف مدرب</button>
+      <button id="copyChildrenDataBtn" class="admin-only">نسخ</button>
+      <button id="exportChildrenCSVBtn" class="admin-only">تصدير CSV</button>
+    </div>
+    <div id="childrenSwimmingTable"></div>
+  </div>
+
+  <div class="page-section hidden" id="monthlyReport">
+    <h2>التقرير الشهري</h2>
+    <div class="filter-section">
+      <select id="reportMonth">
+        <option value="">اختر الشهر</option>
+        <option value="01">يناير</option>
+        <option value="02">فبراير</option>
+        <option value="03">مارس</option>
+        <option value="04">أبريل</option>
+        <option value="05">مايو</option>
+        <option value="06">يونيو</option>
+        <option value="07">يوليو</option>
+        <option value="08">أغسطس</option>
+        <option value="09">سبتمبر</option>
+        <option value="10">أكتوبر</option>
+        <option value="11">نوفمبر</option>
+        <option value="12">ديسمبر</option>
+      </select>
+      <select id="reportYear"></select>
+      <select id="filterReportActivity" onchange="generateMonthlyReport()">
+        <option value="">كل الأنشطة</option>
+        <option value="سباحة أطفال">سباحة أطفال</option>
+        <option value="كورة">كورة</option>
+        <option value="كاراتيه">كاراتيه</option>
+        <option value="جمباز">جمباز</option>
+        <option value="سباحة سيدات">سباحة سيدات</option>
+        <option value="كرة سلة">كرة سلة</option>
+        <option value="قدم بنات">قدم بنات</option>
+      </select>
+      <button id="copyReportBtn" class="admin-only">نسخ</button>
+      <button id="exportReportBtn" class="admin-only">تصدير CSV</button>
+    </div>
+    <div id="reportTable"></div>
+    <div id="miniReport"></div>
+  </div>
+
+  <div id="searchModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeSearchModal()">×</span>
+      <h2>البحث عن مشترك للتجديد</h2>
+      <input type="text" id="searchModalInput" placeholder="ابحث بالاسم أو الجوال..." oninput="searchForRenewal()"/>
+      <div id="searchModalTable"></div>
+    </div>
+  </div>
+
+  <script src="/script.js"></script>
+</body>
 </html>
