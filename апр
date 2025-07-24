@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Хоррор Квест</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: black;
+      color: white;
+      text-align: center;
+      padding-top: 20%;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: red;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: darkred;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 id="message">Зайди</h1>
+  <button onclick="nextStep()">Продолжить</button>
+
+  <script>
+    const messages = [
+      "Ты точно уверена?",
+      "Ну ты уверена, да?",
+      "Удачи на хоррор квесте 👻"
+    ];
+
+    let step = 0;
+
+    function nextStep() {
+      if (step < messages.length) {
+        document.getElementById("message").innerText = messages[step];
+        step++;
+      } else {
+        // Последний шаг: скрываем кнопку
+        document.querySelector("button").style.display = "none";
+      }
+    }
+  </script>
+
+</body>
+</html>
