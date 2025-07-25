@@ -1,0 +1,38 @@
+const { Client, GatewayIntentBits } = require('discord.js');
+
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+});
+
+// Küfürlü kelimeler listesi
+const KUFURLER = ["amk", "aq", "orospu", "yarrak", "salak", "siktir", "piç"];
+
+client.on('ready', () => {
+  console.log(`Bot aktif: ${client.user.tag}`);
+});
+
+client.on('messageCreate', async (message) => {
+  if (message.author.bot) return;
+
+  const mesaj = message.content.toLowerCase();
+
+  // Küfür kontrolü
+  if (KUFURLER.some(kufur => mesaj.includes(kufur))) {
+    try {
+      await message.delete();
+      await message.channel.send(`${message.author}, küfür etmek yasak!`);
+    } catch (err) {
+      console.error('Mesaj silinemedi:', err);
+    }
+  }
+
+  if (mesaj === '!selam') {
+    message.reply('Merhaba! Ben Mythoria ai  :)');
+  }
+});
+
+client.login(process.env.TOKEN);
