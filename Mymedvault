@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MyMedVault</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>🩺 MyMedVault</h1>
+
+    <form id="medical-form">
+      <label>Name:</label>
+      <input type="text" id="name" required />
+
+      <label>Blood Type:</label>
+      <input type="text" id="blood" required />
+
+      <label>Allergies:</label>
+      <input type="text" id="allergies" />
+
+      <label>Medical Conditions:</label>
+      <input type="text" id="conditions" />
+
+      <label>Emergency Contact (Phone):</label>
+      <input type="text" id="emergency" required />
+
+      <button type="submit">Generate QR</button>
+    </form>
+
+    <div id="result">
+      <h3>📌 Your Emergency QR:</h3>
+      <img id="qr-code" alt="QR Code will appear here" />
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
