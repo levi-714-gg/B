@@ -1,0 +1,21 @@
+import express from "express";
+import TelegramBot from "node-telegram-bot-api";
+
+const app = express();
+const token = process.env.BOT_TOKEN; // از ENV در Railway
+const bot = new TelegramBot(token, { polling: true });
+
+bot.on("message", (msg) => {
+  if (msg.text === "/start") {
+    bot.sendMessage(msg.chat.id, "سلام! این یک مینی اپ برای انتقال توکن‌هاست.");
+  }
+});
+
+app.get("/", (req, res) => {
+  res.send("ربات آنلاین است!");
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
