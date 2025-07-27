@@ -1,56 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="uk">
 <head>
-  <!-- 
-      This is an HTML comment
-      You can write text in a comment and the content won't be visible in the page
-    -->
+  <meta charset="UTF-8">
+  <title>Запрошення</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
 
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="https://glitch.com/favicon.ico" />
+    h1 {
+      font-size: 2em;
+      margin-bottom: 2rem;
+    }
 
-  <!--
-      This is the page head - it contains info the browser uses
-      Like the title, which appears on the browser tab but not inside the page
-      Further down you'll see the content that displays in the page
-    -->
-  <title>Hello World!</title>
+    button {
+      margin: 0.5rem;
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      border: none;
+      border-radius: 10px;
+      background: #ff0055;
+      color: white;
+      transition: background 0.3s;
+    }
 
-  <!-- The website stylesheet -->
-  <link rel="stylesheet" href="/style.css" />
-
-  <!-- The website JavaScript file -->
-  <script src="/script.js" defer></script>
+    button:hover {
+      background: #cc0044;
+    }
+  </style>
 </head>
-
 <body>
-  <!--
-      The body includes the content you see in the page
-      Each element is defined using tags, like this <div></div>
-      The attributes like class="wrapper" let us style elements in the CSS
-    -->
-  <div class="wrapper">
-    <div class="content" role="main">
-      <h1 class="title">Oh hi website!</h1>
-      <img src="/cool-website.svg" class="illustration" alt="cool website" />
-      <div class="instructions">
-        <p>
-          Fork <a href="https://github.com/glitchdotcom/website-to-compute">this project</a> and open it in a GitHub Codespace.
-        </p>
-        <p> Follow the steps in the README to deploy your new website to Fastly in a few steps!
-        </p>
-
-      </div>
-
-      <footer class="footer">
-        <div>
-          <a class="remix" href="https://github.com/glitchdotcom/website-to-compute">🚧 Get your own site</a>
-        </div>
-      </footer>
-    </div>
+  <h1>Приглашаю піти нахуй (на мій)</h1>
+  <div>
+    <button onclick="goAway()">Так</button>
+    <button onclick="goAway()">Так, звісно!</button>
   </div>
-</body>
 
+  <script>
+    function goAway() {
+      window.location.href = "https://www.google.com/";
+    }
+  </script>
+</body>
 </html>
