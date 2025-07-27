@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>دولاب الحظ الروحاني</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #fff9f0;
+      text-align: center;
+      padding: 30px;
+    }
+    h1 {
+      color: #722f37;
+    }
+    #wheel {
+      margin: 20px auto;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      border: 10px solid #722f37;
+      position: relative;
+      overflow: hidden;
+      transform: rotate(0deg);
+      transition: transform 5s ease-out;
+    }
+    .segment {
+      width: 50%;
+      height: 50%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform-origin: 0% 0%;
+      background: #ffc8dd;
+      border: 1px solid #fff;
+      text-align: right;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+    #result {
+      font-size: 20px;
+      margin-top: 20px;
+      color: #3b0a0a;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    #pointer {
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 30px solid #722f37;
+      position: absolute;
+      top: -30px;
+      left: calc(50% - 20px);
+    }
+  </style>
+</head>
+<body>
+
+<h1>✨ دولاب حظك الروحاني ✨</h1>
+
+<input type="text" id="username" placeholder="اكتب اسمك" />
+<br />
+<button onclick="spin()">🎡 لف الدولاب</button>
+
+<div id="wheel-container">
+  <div id="pointer"></div>
+  <div id="wheel"></div>
+</div>
+
+<div id="result"></div>
+
+<!-- EmailJS SDK -->
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@2/dist/email.min.js"></script>
+
+<script>
+  // الجوائز
+  const prizes = [
+    "قراءة كف مجانية",
+    "خصم 5%",
+    "حظ أوفر",
+    "حظ أوفر",
+    "قراءة خريطة فلكية"
+  ];
+
+  // رسم الدولاب
+  const wheel = document.getElementById("wheel");
+  for (let i = 0; i < prizes.length; i++) {
+    const segment = document.createElement("div");
+    segment.className = "segment";
+    const angle = (360 / prizes.length) * i;
+    segment.style.transform = `rotate(${angle}deg) skewY(-60deg)`;
+    segment.innerText = prizes[i];
+    wheel.appendChild(segment);
+  }
+
+  let spun = false;
+
+  function spin() {
+    const username = document.getElementById("username").value.trim();
+    const resultDiv = document.getElementById("result");
+
+    if (!username) {
+      alert("من فضلك أدخل اسمك أولاً.");
+      return;
+    }
+
+    // منع التكرار
+    if (localStorage.getItem("spun_" + username)) {
+      alert("لقد قمت بتجربة حظك مسبقاً!");
+      return;
+    }
+
+    spun = true;
+    const randomDeg = Math.floor(Math.random() * 360) + 1800; // 5 دورات كاملة
+    wheel.style.transform = `rotate(${randomDeg}deg)`;
+
+    // تحديد النتيجة بعد الدوران
+    setTimeout(() => {
+      const prizeIndex = Math.floor(((360 - (randomDeg % 360)) % 360) / (360 / prizes.length));
+      const selectedPrize = prizes[prizeIndex];
+
+      resultDiv.innerHTML = `🎉 ${username} نتيجتك: <strong>${selectedPrize}</strong>`;
+
+      // حفظ النتيجة لعدم تكرار السحب
+      localStorage.setItem("spun_" + username, selectedPrize);
+
+      // إرسال الإيميل عبر EmailJS
+      emailjs.init("service_uwvcrvr"); // ✨ 
+      emailjs.send("service_uwvcrvr", "template_p8crb1o", {
+        user_name: username,
+        user_result: selectedPrize
+      }).then(() => {
+        console.log("📩 تم إرسال النتيجة على الإيميل.");
+      }, (err) => {
+        console.error("فشل إرسال الإيميل:", err);
+      });
+
+    }, 5200); // بعد انتهاء الدوران
+  }
+</script>
+
+</body>
+</html>
