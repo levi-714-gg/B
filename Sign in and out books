@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Daycare Sign-In</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@2.3.2/dist/signature_pad.min.js"></script>
+  <style>
+    body { font-family: Arial; text-align: center; margin: 2em; }
+    canvas { border: 1px solid #000; margin: 1em 0; }
+    #submit { margin-top: 1em; }
+  </style>
+</head>
+<body>
+  <h2>Sign Your Child In</h2>
+  <input type="text" id="childName" placeholder="Enter your child's name" /><br>
+  <canvas id="signature-pad" width=300 height=150></canvas><br>
+  <button onclick="clearSignature()">Clear Signature</button>
+  <button id="submit">Sign In</button>
+
+  <script>
+    // 🧩 Replace with your Firebase config:
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    const canvas = document.getElementById("signature-pad");
+    const signaturePad = new SignaturePad(canvas);
+
+    function clearSignature() {
+      signaturePad.clear();
+    }
+
+    document.getElementById("submit").addEventListener("click", async () => {
+      const childName = document.getElementById("childName").value.trim();
+      if (!childName || signaturePad.isEmpty()) {
+        alert("Please enter your child's name and provide a signature.");
+        return;
+      }
+
+      const timestamp = new Date();
+      const dataUrl = signaturePad.toDataURL();
+
+      // Save signature image to Firebase Storage
+      const filename = `signatures/${childName}_${timestamp.getTime()}.png`;
+      const storageRef = storage.ref(filename);
+      const snapshot = await storageRef.putString(dataUrl, 'data_url');
+      const imageUrl = await snapshot.ref.getDownloadURL();
+
+      // Save entry to Firestore
+      await db.collection("signins").add({
+        childName: childName,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        signatureUrl: imageUrl
+      });
+
+      alert("Signed in successfully!");
+      document.getElementById("childName").value = "";
+      signaturePad.clear();
+    });
+  </script>
+</body>
+</html>
