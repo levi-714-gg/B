@@ -1,12 +1,4 @@
-{
-  "name": "website-to-compute",
-  "version": "0.0.1",
-  "scripts": {
-    "start": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "vite": "^6.2.2"
-  }
+"dependencies": {
+  "express": "^4.17.1",
+  "twilio": "^5.2.2"  // Use the latest version; Glitch will install it automatically
 }
