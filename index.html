@@ -1,56 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-  <!-- 
-      This is an HTML comment
-      You can write text in a comment and the content won't be visible in the page
-    -->
-
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="https://glitch.com/favicon.ico" />
-
-  <!--
-      This is the page head - it contains info the browser uses
-      Like the title, which appears on the browser tab but not inside the page
-      Further down you'll see the content that displays in the page
-    -->
-  <title>Hello World!</title>
-
-  <!-- The website stylesheet -->
-  <link rel="stylesheet" href="/style.css" />
-
-  <!-- The website JavaScript file -->
-  <script src="/script.js" defer></script>
+  <title>Happy Birthday!</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #000;
+      color: #fff;
+      font-family: sans-serif;
+      text-align: center;
+    }
+    h1 {
+      margin-top: 20vh;
+      font-size: 3em;
+      color: #f0e130;
+    }
+    p {
+      font-size: 1.5em;
+    }
+    .btn {
+      background: #f0e130;
+      color: #000;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      border: none;
+      margin-top: 20px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+    .game-box {
+      margin-top: 50px;
+      border: 3px solid #f0e130;
+      padding: 30px;
+      display: inline-block;
+    }
+  </style>
 </head>
-
 <body>
-  <!--
-      The body includes the content you see in the page
-      Each element is defined using tags, like this <div></div>
-      The attributes like class="wrapper" let us style elements in the CSS
-    -->
-  <div class="wrapper">
-    <div class="content" role="main">
-      <h1 class="title">Oh hi website!</h1>
-      <img src="/cool-website.svg" class="illustration" alt="cool website" />
-      <div class="instructions">
-        <p>
-          Fork <a href="https://github.com/glitchdotcom/website-to-compute">this project</a> and open it in a GitHub Codespace.
-        </p>
-        <p> Follow the steps in the README to deploy your new website to Fastly in a few steps!
-        </p>
-
-      </div>
-
-      <footer class="footer">
-        <div>
-          <a class="remix" href="https://github.com/glitchdotcom/website-to-compute">🚧 Get your own site</a>
-        </div>
-      </footer>
-    </div>
+  <h1>🎮 Happy Birthday, Champ!</h1>
+  <div class="game-box">
+    <p>You've unlocked a new level: <strong>AGE +1</strong></p>
+    <p>Wishing you extra lives, power-ups, and zero lag!</p>
+    <button class="btn" onclick="alert('🎉 Bonus Level Unlocked! Have a great year ahead!')">Claim Your Gift</button>
   </div>
 </body>
-
 </html>
