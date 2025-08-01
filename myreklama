@@ -1,0 +1,57 @@
+import os
+from pyrogram import Client
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from flask import Flask
+from threading import Thread
+
+# API данные из переменных окружения
+API_ID = int(os.getenv("API_ID"))
+API_HASH = os.getenv("API_HASH")
+
+TARGET_CHATS = [
+    -1001572916927, -1001534022169, -1002370663987
+]
+
+AD_TEXT = """🇪🇺Ассаломалекум 🇪🇺
+Всем привет👋
+У нас есть всё необходимое
+Почта ✉️ 
+Доставка 📦
+
+Свяжитесь с нами
+Телеграм +79630871841
+WhatsApp +79630871841
+"""
+
+app = Client("userbot_session", api_id=API_ID, api_hash=API_HASH)
+scheduler = AsyncIOScheduler()
+
+async def send_ads():
+    for chat_id in TARGET_CHATS:
+        try:
+            await app.send_message(chat_id, AD_TEXT)
+            print(f"✅ Отправлено: {chat_id}")
+        except Exception as e:
+            print(f"❌ Ошибка: {e}")
+
+@app.on_client_start
+async def start_scheduler(client):
+    scheduler.add_job(send_ads, "interval", hours=4)
+    scheduler.start()
+    print("✅ Userbot запущен")
+
+flask_app = Flask('')
+
+@flask_app.route('/')
+def home():
+    return "Userbot работает!"
+
+def run():
+    flask_app.run(host='0.0.0.0', port=int(os.getenv("PORT", 8080)))
+
+def keep_alive():
+    Thread(target=run).start()
+
+if name == "__main__":
+    keep_alive()
+    app.run()
