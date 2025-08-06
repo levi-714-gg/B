@@ -119,22 +119,7 @@ _The app itself only needs deployed to Fastly once, when you click the **🚀 Pu
 
 ⚙️ The settings we use to create the guided experience in the codespace are in the `.devcontainer/` folder.
 
-🧰 You'll find the Fastly CLI commands we use under the hood in the `helpers/publish.sh` script.
-
-💻 If you check the right-hand side of the **Terminal** you'll find multiple processes – this is to run the vite and Fastly commands.
-
-### Extensions
-
-This project uses the following extensions from the dev community! 🙌
-
-* [VSCode Action Buttons Ext](https://marketplace.visualstudio.com/items?itemName=jkearins.action-buttons-ext)
-* [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint)
-
-## Keep going! 🛸
-
-**Don't stop there, <a href="https://www.fastly.com/documentation/solutions/tutorials/deliver-your-site/#sending-domain-traffic-to-fastly" target="_blank">add a domain to your new site</a>.**
-
-You'll find your service in your Fastly account control panel – check out the **Observability** stats! 📊
+🧰 You'll find the Fastly CLI commands we use ** stats! 📊
 
 Check out more tips on using the <a href="https://github.com/fastly/compute-js-static-publish" target="_blank">Static Publisher</a> in its `README`. Note that if you change the Compute code, you'll need to run a separate deploy command to push your changes to Fastly as the **🚀 Publish** button only deploys once, after that it just updates your KV content.
 
