@@ -1,56 +1,143 @@
-<!DOCTYPE html>
-<html lang="en">
-
+ <!DOCTYPE html>
+<html lang="pl">
 <head>
-  <!-- 
-      This is an HTML comment
-      You can write text in a comment and the content won't be visible in the page
-    -->
-
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" href="https://glitch.com/favicon.ico" />
-
-  <!--
-      This is the page head - it contains info the browser uses
-      Like the title, which appears on the browser tab but not inside the page
-      Further down you'll see the content that displays in the page
-    -->
-  <title>Hello World!</title>
-
-  <!-- The website stylesheet -->
-  <link rel="stylesheet" href="/style.css" />
-
-  <!-- The website JavaScript file -->
-  <script src="/script.js" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Podbeskidzie News</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background-color: #f0f0f0;
+    }
+    header {
+        background: linear-gradient(90deg, #c8102e, #004b87);
+        color: white;
+        padding: 15px;
+        text-align: center;
+        font-size: 24px;
+        font-weight: bold;
+    }
+    .news-list {
+        padding: 10px;
+        background-color: #2e7d32; /* zielona murawa */
+        min-height: 60vh;
+    }
+    .news-item {
+        background-color: white;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .news-item img {
+        width: 100%;
+        height: auto;
+        display: block;
+    }
+    .news-content {
+        padding: 10px;
+    }
+    .news-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    .news-desc {
+        font-size: 14px;
+        color: #333;
+    }
+    .form-container {
+        background-color: #fff;
+        padding: 10px;
+        border-top: 3px solid #c8102e;
+    }
+    input, textarea {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 8px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+    button {
+        background: linear-gradient(90deg, #c8102e, #004b87);
+        color: white;
+        border: none;
+        padding: 10px;
+        width: 100%;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    button:hover {
+        opacity: 0.9;
+    }
+</style>
 </head>
-
 <body>
-  <!--
-      The body includes the content you see in the page
-      Each element is defined using tags, like this <div></div>
-      The attributes like class="wrapper" let us style elements in the CSS
-    -->
-  <div class="wrapper">
-    <div class="content" role="main">
-      <h1 class="title">Oh hi website!</h1>
-      <img src="/cool-website.svg" class="illustration" alt="cool website" />
-      <div class="instructions">
-        <p>
-          Fork <a href="https://github.com/glitchdotcom/website-to-compute">this project</a> and open it in a GitHub Codespace.
-        </p>
-        <p> Follow the steps in the README to deploy your new website to Fastly in a few steps!
-        </p>
 
-      </div>
+<header>Podbeskidzie News</header>
 
-      <footer class="footer">
-        <div>
-          <a class="remix" href="https://github.com/glitchdotcom/website-to-compute">🚧 Get your own site</a>
-        </div>
-      </footer>
-    </div>
-  </div>
+<div class="news-list" id="newsList"></div>
+
+<div class="form-container">
+    <h3>Dodaj news</h3>
+    <input type="text" id="title" placeholder="Tytuł" required>
+    <input type="text" id="image" placeholder="Link do zdjęcia">
+    <textarea id="desc" placeholder="Krótki opis" required></textarea>
+    <textarea id="full" placeholder="Pełna treść newsa" required></textarea>
+    <button onclick="addNews()">Dodaj</button>
+</div>
+
+<script>
+    let newsData = JSON.parse(localStorage.getItem('newsData')) || [];
+
+    function renderNews() {
+        const list = document.getElementById('newsList');
+        list.innerHTML = '';
+        newsData.forEach((news, index) => {
+            let div = document.createElement('div');
+            div.className = 'news-item';
+            div.innerHTML = `
+                <img src="${news.image || 'https://via.placeholder.com/400x200?text=Brak+zdjecia'}" alt="">
+                <div class="news-content">
+                    <div class="news-title">${news.title}</div>
+                    <div class="news-desc">${news.desc}</div>
+                    <button onclick="showFull(${index})">Czytaj więcej</button>
+                </div>
+            `;
+            list.appendChild(div);
+        });
+    }
+
+    function showFull(index) {
+        alert(newsData[index].full);
+    }
+
+    function addNews() {
+        const title = document.getElementById('title').value;
+        const image = document.getElementById('image').value;
+        const desc = document.getElementById('desc').value;
+        const full = document.getElementById('full').value;
+
+        if (!title || !desc || !full) {
+            alert("Wypełnij wszystkie pola!");
+            return;
+        }
+
+        newsData.unshift({ title, image, desc, full });
+        localStorage.setItem('newsData', JSON.stringify(newsData));
+        renderNews();
+
+        document.getElementById('title').value = '';
+        document.getElementById('image').value = '';
+        document.getElementById('desc').value = '';
+        document.getElementById('full').value = '';
+    }
+
+    renderNews();
+</script>
+
 </body>
-
 </html>
