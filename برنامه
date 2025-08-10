@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>برنامه‌ریز مدرسه</title>
+  <style>
+    body {
+      font-family: "Vazir", sans-serif;
+      background: #f9f9f9;
+      color: #333;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .grade-section {
+      margin-bottom: 40px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 10px;
+      text-align: center;
+    }
+    td[contenteditable] {
+      background-color: #fffbe6;
+      cursor: pointer;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>برنامه‌ریز هفتگی مدرسه</h1>
+
+  <div id="app"></div>
+
+  <button onclick="downloadPDF()">📄 خروجی PDF</button>
+
+  <script>
+    const grades = ["هفتم", "هشتم", "نهم"];
+    const days = ["شنبه", "یکشنبه", "دوشنبه", "سه‌شنبه", "چهارشنبه"];
+
+    const app = document.getElementById("app");
+
+    grades.forEach(grade => {
+      const section = document.createElement("div");
+      section.className = "grade-section";
+      section.innerHTML = `<h2>پایه ${grade}</h2>`;
+      
+      const table = document.createElement("table");
+      const thead = document.createElement("thead");
+      const headerRow = document.createElement("tr");
+      headerRow.innerHTML = "<th>روز</th><th>درس ۱</th><th>درس ۲</th><th>درس ۳</th><th>درس ۴</th><th>درس ۵</th>";
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      const tbody = document.createElement("tbody");
+      days.forEach(day => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${day}</td>` +
+          "<td contenteditable='true'></td>".repeat(5);
+        tbody.appendChild(row);
+      });
+
+      table.appendChild(tbody);
+      section.appendChild(table);
+      app.appendChild(section);
+    });
+
+    function downloadPDF() {
+      alert("برای خروجی PDF، لطفاً از قابلیت چاپ مرورگر استفاده کنید (Ctrl+P یا گزینه Print). نسخه پیشرفته‌تر با خروجی PDF واقعی در نسخه بعدی اضافه می‌شود.");
+    }
+  </script>
+</body>
+</html>
