@@ -1,0 +1,226 @@
+// server.js
+// Tek dosyada: sunucu + gömülü HTML/CSS/JS (Socket.IO client CDN kullanılıyor)
+// Glitch veya herhangi bir Node hostta: node server.js ile çalışır.
+
+const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
+
+// Basit kullanıcı listesi
+const users = new Map(); // socket.id -> username
+
+// Kök: gömülü HTML döndür
+app.get("/", (req, res) => {
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.send(`<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Birleşik Socket.IO Sohbet</title>
+  <style>
+    /* Gömülü CSS (aynı stil ile) */
+    * { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
+    body { margin: 0; background:#f2f4f8; color:#111; }
+    .container { display:flex; flex-direction:column; gap:12px; padding:12px; max-width:1000px; margin:12px auto; }
+    .top { display:flex; gap:8px; align-items:center; }
+    .top input { padding:8px; border:1px solid #ddd; border-radius:6px; flex:1; }
+    .top button { padding:8px 10px; border:none; background:#2563eb; color:#fff; border-radius:6px; cursor:pointer; }
+    .layout { display:flex; gap:12px; }
+    .sidebar {
+      width:260px; background:#fff; border-radius:10px; padding:16px; box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+      height:70vh; overflow:auto;
+    }
+    .chat {
+      flex:1; display:flex; flex-direction:column; background:#fff; border-radius:10px; padding:12px; box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+      height:70vh;
+    }
+    h2{margin:0 0 8px 0;font-size:18px;}
+    .users { list-style:none; padding:0; margin:0; max-height:45vh; overflow:auto; }
+    .users li { padding:6px 8px; border-bottom:1px solid #f1f3f5; font-size:14px; }
+    .messages { flex:1; overflow:auto; padding:12px; background:linear-gradient(180deg,#fff,#fafafa); border-radius:8px; }
+    .msg { margin-bottom:12px; padding:8px 10px; border-radius:8px; background:#f3f4f6; max-width:70%; }
+    .msg.me { margin-left:auto; background:#dcfce7; }
+    .msg .t { font-size:11px; color:#6b7280; margin-left:8px; }
+    .composer { display:flex; gap:8px; padding-top:8px; }
+    .composer input { flex:1; padding:10px; border:1px solid #ddd; border-radius:8px; }
+    .composer button { padding:10px 14px; border:none; background:#10b981; color:#fff; border-radius:8px; cursor:pointer; }
+    .system { margin-top:10px; color:#6b7280; font-size:13px; min-height:20px; }
+    .typing { height:18px; color:#6b7280; font-size:13px; padding-top:6px; }
+    @media (max-width:800px){
+      .layout { flex-direction:column; }
+      .sidebar { width:100%; height:200px; }
+      .chat { height:calc(70vh - 200px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top">
+      <input id="nameInput" placeholder="Adın (ör. Melikşah)" />
+      <button id="joinBtn">Bağlan</button>
+      <button id="openLink" style="background:#6b7280;margin-left:6px;">Yeni sekmede aç</button>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <h2>Bağlı Kullanıcılar</h2>
+        <ul id="usersList" class="users"></ul>
+        <div id="systemMsg" class="system"></div>
+      </aside>
+
+      <main class="chat">
+        <div id="chatWindow" class="messages"></div>
+
+        <div class="composer">
+          <input id="messageInput" placeholder="Mesaj yaz..." autocomplete="off" />
+          <button id="sendBtn">Gönder</button>
+        </div>
+        <div id="typing" class="typing"></div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Socket.IO client (CDN) -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    const nameInput = document.getElementById("nameInput");
+    const joinBtn = document.getElementById("joinBtn");
+    const usersList = document.getElementById("usersList");
+    const chatWindow = document.getElementById("chatWindow");
+    const messageInput = document.getElementById("messageInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const systemMsg = document.getElementById("systemMsg");
+    const typingDiv = document.getElementById("typing");
+    const openLink = document.getElementById("openLink");
+
+    let myName = "";
+    let typingTimeout = null;
+
+    function addMessage(itemHTML, className = "") {
+      const el = document.createElement("div");
+      el.className = "msg " + className;
+      el.innerHTML = itemHTML;
+      chatWindow.appendChild(el);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    joinBtn.addEventListener("click", () => {
+      const name = nameInput.value.trim();
+      if (!name) {
+        alert("Lütfen bir ad gir!");
+        return;
+      }
+      myName = name;
+      socket.emit("join", myName);
+      nameInput.disabled = true;
+      joinBtn.disabled = true;
+      messageInput.focus();
+    });
+
+    sendBtn.addEventListener("click", sendMessage);
+    messageInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+      socket.emit("typing", true);
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => socket.emit("typing", false), 800);
+    });
+
+    function sendMessage(){
+      const text = messageInput.value.trim();
+      if (!text) return;
+      socket.emit("message", text);
+      messageInput.value = "";
+      socket.emit("typing", false);
+    }
+
+    socket.on("message", (payload) => {
+      const time = new Date(payload.time).toLocaleTimeString();
+      const content = '<strong>' + escapeHtml(payload.username) + '</strong> <span class="t">' + time + '</span><div>' + escapeHtml(payload.text) + '</div>';
+      addMessage(content, payload.username === myName ? "me" : "");
+    });
+
+    socket.on("system", (txt) => {
+      systemMsg.textContent = txt;
+      setTimeout(() => (systemMsg.textContent = ""), 3000);
+    });
+
+    socket.on("users", (arr) => {
+      usersList.innerHTML = "";
+      arr.forEach((u) => {
+        const li = document.createElement("li");
+        li.textContent = u;
+        usersList.appendChild(li);
+      });
+    });
+
+    socket.on("typing", ({ username, isTyping }) => {
+      if (isTyping) {
+        typingDiv.textContent = username + " yazıyor...";
+      } else {
+        typingDiv.textContent = "";
+      }
+    });
+
+    function escapeHtml(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    // "Yeni sekmede aç" butonu: glitch/prod linkini açmak için (isteğe bağlı)
+    openLink.addEventListener("click", () => {
+      window.open(window.location.href, "_blank");
+    });
+  </script>
+</body>
+</html>`);
+});
+
+// Socket.IO olayları
+io.on("connection", (socket) => {
+  console.log("Yeni bağlantı:", socket.id);
+
+  socket.on("join", (username) => {
+    users.set(socket.id, username || "Anonim");
+    io.emit("users", Array.from(users.values()));
+    socket.broadcast.emit("system", `${users.get(socket.id)} katıldı.`);
+  });
+
+  socket.on("message", (msg) => {
+    const username = users.get(socket.id) || "Anonim";
+    const payload = {
+      id: socket.id,
+      username,
+      text: msg,
+      time: new Date().toISOString(),
+    };
+    io.emit("message", payload);
+  });
+
+  socket.on("typing", (isTyping) => {
+    const username = users.get(socket.id) || "Anonim";
+    socket.broadcast.emit("typing", { username, isTyping });
+  });
+
+  socket.on("disconnect", () => {
+    const username = users.get(socket.id) || "Anonim";
+    users.delete(socket.id);
+    io.emit("users", Array.from(users.values()));
+    socket.broadcast.emit("system", `${username} ayrıldı.`);
+    console.log(`${username} ayrıldı (${socket.id})`);
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log(\`Sunucu çalışıyor: http://localhost:\${PORT}\`);
+});
